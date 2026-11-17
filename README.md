@@ -7,7 +7,7 @@ OmiWink is a tiny Omarchy bar face with eyes that follow your cursor. It blinks 
 OmiWink requires Omarchy's Quattro shell, Hyprland, and Python 3. Install it with:
 
 ```sh
-omarchy plugin add https://github.com/anugrahvibi/omapeek.git --enable
+omarchy plugin add https://github.com/anugrahvibi/OmiWink.git --enable
 ```
 
 To remove it, disable and remove the plugin:
