@@ -8,10 +8,10 @@ import qs.Commons
 
 BarWidget {
   id: root
-  moduleName: "anugrahvibi.omapeek"
+  moduleName: "anugrahvibi.omiwink"
 
   readonly property string cursorReaderPath: decodeURIComponent(
-    String(Qt.resolvedUrl("cursor_reader.py")).replace(/^file:\/\//, ""))
+    String(Qt.resolvedUrl("omiwink_cursor_reader.py")).replace(/^file:\/\//, ""))
   readonly property var hostWindow: root.QsWindow.window
   readonly property string hostScreenName: hostWindow && hostWindow.screen
     ? String(hostWindow.screen.name || "") : ""
@@ -71,7 +71,7 @@ BarWidget {
         root.monitorPowerStates = states
       })
     } catch (error) {
-      console.warn("omapeek: unable to refresh display power state")
+      console.warn("omiwink: unable to refresh display power state")
     }
   }
 
@@ -112,7 +112,7 @@ BarWidget {
     } catch (error) {
       if (!root.cursorReaderErrorLogged) {
         root.cursorReaderErrorLogged = true
-        console.warn("omapeek: cursor reader data rejected: " + String(error))
+        console.warn("omiwink: cursor reader data rejected: " + String(error))
       }
     }
   }
@@ -135,7 +135,7 @@ BarWidget {
     id: faceContainer
     anchors.fill: parent
 
-    BotFace {
+    OmiWinkFace {
       anchors.centerIn: faceContainer
       visible: root.faceVisible
       faceSize: 18
@@ -149,7 +149,7 @@ BarWidget {
     }
   }
 
-  MascotMotion {
+  OmiWinkMotion {
     id: mascotMotion
     active: root.faceVisible
   }
@@ -179,7 +179,7 @@ BarWidget {
       onRead: function(line) { root.handleCursorLine(line) }
     }
     stderr: SplitParser {
-      onRead: function(line) { console.warn("omapeek cursor reader: " + line) }
+      onRead: function(line) { console.warn("omiwink cursor reader: " + line) }
     }
     onStarted: write(displayIdle.isIdle ? "pause\n" : "resume\n")
   }

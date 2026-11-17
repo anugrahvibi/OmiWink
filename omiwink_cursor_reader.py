@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Low-rate Hyprland cursor reader for the Omarchy menu face."""
+"""Low-rate Hyprland cursor reader for the OmiWink Omarchy bar face."""
 
 from __future__ import annotations
 

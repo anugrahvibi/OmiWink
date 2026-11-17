@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "anugrahvibi.omapeek",
-  "name": "OmaPeek",
+  "id": "anugrahvibi.omiwink",
+  "name": "OmiWink",
   "version": "1.0.0",
   "author": "Anugrah Vibi",
   "description": "A tiny Omarchy face that follows the cursor, blinks, and glances around.",
@@ -9,10 +9,10 @@
     "bar-widget"
   ],
   "entryPoints": {
-    "barWidget": "BarWidget.qml"
+    "barWidget": "OmiWinkBarWidget.qml"
   },
   "barWidget": {
-    "displayName": "OmaPeek",
+    "displayName": "OmiWink",
     "description": "A tiny pair of eyes that follows your cursor.",
     "category": "Compositor",
     "allowMultiple": false
