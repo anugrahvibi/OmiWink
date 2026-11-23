@@ -137,11 +137,14 @@ BarWidget {
 
     OmiWinkFace {
       anchors.centerIn: faceContainer
+      anchors.horizontalCenterOffset: mascotMotion.shiftX
+      anchors.verticalCenterOffset: mascotMotion.shiftY
       visible: root.faceVisible
       faceSize: 18
       gazeX: mascotMotion.gazeX
       gazeY: mascotMotion.gazeY
       blinkProgress: mascotMotion.blinkProgress
+      wink: mascotMotion.wink
       expression: mascotMotion.expression
       pulse: mascotMotion.pulse
       faceColor: root.bar ? root.bar.barForeground : "#e6e6e8"

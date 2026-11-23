@@ -13,6 +13,14 @@ Item {
   property real blinkProgress: 0
   property real expression: 0
   property real pulse: 0
+  property real wink: 0
+  property real shiftX: 0
+  property real shiftY: 0
+  property int lastIdleAction: -1
+  property bool idleActionRunning: false
+  property bool cursorMovedDuringAction: false
+  property real pendingCursorX: 0
+  property real pendingCursorY: 0
   property real currentGlanceX: 0
   property real currentGlanceY: 0
   property int gazeDuration: 180
@@ -26,6 +34,13 @@ Item {
     var distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
     if (distance < 0.5) return
 
+    if (root.idleActionRunning) {
+      root.pendingCursorX = deltaX / distance
+      root.pendingCursorY = deltaY / distance
+      root.cursorMovedDuringAction = true
+      return
+    }
+
     idleGlanceTimer.stop()
     glanceHoldTimer.stop()
     expressionTimer.stop()
@@ -33,14 +48,13 @@ Item {
     cursorPauseTimer.restart()
     root.expression = 0
     root.pulse = 0
-    root.gazeAnimated = false
-    root.gazeX = deltaX / distance
-    root.gazeY = deltaY / distance
+    root.wink = 0
+    root.setGaze(deltaX / distance, deltaY / distance, 160)
   }
 
   function scheduleIdleGlance() {
     if (!root.active) return
-    idleGlanceTimer.interval = 2800 + Math.floor(Math.random() * 2400)
+    idleGlanceTimer.interval = 2800 + Math.floor(Math.random() * 3800)
     idleGlanceTimer.restart()
   }
 
@@ -54,23 +68,39 @@ Item {
   function startIdleGlance() {
     if (!root.active) return
 
+    root.idleActionRunning = true
+    root.cursorMovedDuringAction = false
+    var choices = [0, 0, 0, 1, 2, 3, 5, 5].filter(function(value) { return value !== root.lastIdleAction })
+    var action = choices[Math.floor(Math.random() * choices.length)]
+    root.lastIdleAction = action
     var directions = [
       { x: -0.9, y: 0 },
       { x: 0.9, y: 0 },
-      { x: 0, y: -0.95 },
-      { x: 0, y: 0.95 }
+      { x: -0.9, y: 0 },
+      { x: 0.9, y: 0 },
+      { x: 0, y: -0.7 },
+      { x: 0, y: 0.7 }
     ]
     var direction = directions[Math.floor(Math.random() * directions.length)]
 
     root.currentGlanceX = direction.x
     root.currentGlanceY = direction.y
-    root.doubleTakePending = Math.random() < 0.22
-    root.setGaze(direction.x, direction.y, 170)
-    root.expression = 1
-    root.pulse = 1
-    expressionTimer.interval = 360
-    expressionTimer.restart()
-    glanceHoldTimer.interval = 720 + Math.floor(Math.random() * 180)
+    root.doubleTakePending = action === 0 && Math.random() < 0.6
+    if (action === 0) {
+      root.setGaze(direction.x, direction.y, 180 + Math.floor(Math.random() * 120))
+    } else if (action === 1) {
+      root.expression = -0.45
+    } else if (action === 2) {
+      root.wink = Math.random() < 0.5 ? -1 : 1
+    } else if (action === 3) {
+      root.expression = 1
+      root.pulse = 0.7
+    } else if (action === 5) {
+      root.shiftX = direction.x * 2
+      root.shiftY = direction.y * 1.5
+      root.setGaze(-direction.x * 0.5, -direction.y * 0.5, 260)
+    }
+    glanceHoldTimer.interval = 850 + Math.floor(Math.random() * 650)
     glanceHoldTimer.restart()
   }
 
@@ -81,19 +111,18 @@ Item {
       root.doubleTakePending = false
       root.setGaze(-root.currentGlanceX * 0.85,
         -root.currentGlanceY * 0.85, 140)
-      root.expression = 1
-      root.pulse = 0.72
-      expressionTimer.interval = 300
-      expressionTimer.restart()
       glanceHoldTimer.interval = 390
       glanceHoldTimer.restart()
       return
     }
 
-    root.setGaze(0, 0, 220)
+    root.setGaze(0, 0, 280)
     root.expression = 0
     root.pulse = 0
-    root.scheduleIdleGlance()
+    root.wink = 0
+    root.shiftX = 0
+    root.shiftY = 0
+    transitionPauseTimer.restart()
   }
 
   function stopMotion() {
@@ -101,6 +130,7 @@ Item {
     idleGlanceTimer.stop()
     glanceHoldTimer.stop()
     expressionTimer.stop()
+    transitionPauseTimer.stop()
     doubleBlinkTimer.stop()
     blinkAnimation.stop()
     root.gazeAnimated = false
@@ -109,8 +139,13 @@ Item {
     root.blinkProgress = 0
     root.expression = 0
     root.pulse = 0
+    root.wink = 0
+    root.shiftX = 0
+    root.shiftY = 0
     root.blinkCountRemaining = 0
     root.doubleTakePending = false
+    root.idleActionRunning = false
+    root.cursorMovedDuringAction = false
   }
 
   onActiveChanged: Qt.callLater(function() {
@@ -122,6 +157,22 @@ Item {
 
   Component.onCompleted: {
     if (root.active) root.scheduleIdleGlance()
+  }
+
+  Timer {
+    id: transitionPauseTimer
+    interval: 400
+    repeat: false
+    onTriggered: {
+      root.idleActionRunning = false
+      if (root.cursorMovedDuringAction) {
+        root.cursorMovedDuringAction = false
+        root.setGaze(root.pendingCursorX, root.pendingCursorY, 200)
+        cursorPauseTimer.restart()
+      } else {
+        root.scheduleIdleGlance()
+      }
+    }
   }
 
   Timer {
@@ -168,6 +219,7 @@ Item {
     running: root.active
     onTriggered: {
       root.nextBlinkInterval = 3200 + Math.floor(Math.random() * 3000)
+      if (root.idleActionRunning || cursorPauseTimer.running) return
       root.blinkCountRemaining = Math.random() < 0.18 ? 2 : 1
       blinkAnimation.restart()
     }
@@ -229,5 +281,19 @@ Item {
   Behavior on pulse {
     enabled: root.active
     NumberAnimation { duration: 145; easing.type: Easing.OutCubic }
+  }
+
+  Behavior on wink {
+    enabled: root.active
+    NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+  }
+
+  Behavior on shiftX {
+    enabled: root.active
+    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+  }
+  Behavior on shiftY {
+    enabled: root.active
+    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
   }
 }

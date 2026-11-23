@@ -1,5 +1,3 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
 
 Item {
@@ -13,6 +11,7 @@ Item {
   property real blinkProgress: 0
   property real expression: 0
   property real pulse: 0
+  property real wink: 0
 
   width: faceSize
   height: faceSize
@@ -32,13 +31,13 @@ Item {
     Rectangle {
       required property int index
 
-      readonly property real openEyeHeight: root.faceSize
-        * (0.36 + root.expression * 0.08)
-      readonly property real openEyeWidth: root.faceSize
-        * (0.17 + root.expression * 0.015)
+      readonly property real openEyeHeight: root.faceSize * 0.36
+      readonly property real openEyeWidth: root.faceSize * 0.17
 
       width: openEyeWidth
-      height: openEyeHeight * (1 - root.blinkProgress)
+      readonly property real winkAmount: index === 0 ? Math.max(0, -root.wink) : Math.max(0, root.wink)
+      readonly property real winkHeight: openEyeHeight * (1 - winkAmount) + openEyeWidth * 1.2 * winkAmount
+      height: winkHeight * (1 - root.blinkProgress)
         + root.faceSize * 0.04 * root.blinkProgress
       radius: width / 2
       x: root.faceSize * (index === 0 ? 0.25 : 0.60)

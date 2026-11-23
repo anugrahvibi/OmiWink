@@ -1,6 +1,16 @@
 # OmiWink
 
-OmiWink is a tiny Omarchy bar face with eyes that follow your cursor. It blinks and makes occasional idle glances, too.
+OmiWink is a small companion for your Omarchy bar. Its eyes follow your mouse as you work, then blink, wink and look around when you pause. Its idle actions vary in timing and finish before mouse tracking resumes.
+
+![OmiWink in the Omarchy bar](preview.png)
+
+## In your daily workflow
+
+OmiWink sits alongside your other bar widgets while you browse, write or code. It adds a little character to the desktop without opening a window. Its colors follow your bar theme.
+
+![Close-up of the face on an Omarchy bar](images/bar.png)
+
+The screenshots show the same face running in a customized menu widget; the standalone OmiWink plugin uses the same face and animation code.
 
 ## Install
 

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "anugrahvibi.omiwink",
   "name": "OmiWink",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Anugrah Vibi",
   "description": "A tiny Omarchy face that follows the cursor, blinks, and glances around.",
   "kinds": [
